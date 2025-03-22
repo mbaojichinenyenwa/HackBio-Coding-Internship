@@ -1,5 +1,10 @@
-##Team ACG Members' Information
-##Overview
+**Team ACG Members' Information**
+
+
+
+**Overview**
+
+
 This Python script uses a single multi-line `print` statement to display information about the members of Team ACG. The information includes each member's:
 
 -   Name
@@ -11,7 +16,10 @@ This Python script uses a single multi-line `print` statement to display informa
 -   Preferred Programming Language
 
 The script provides a straightforward way to present this data in a formatted text output.
-Code Description
+
+
+
+**Code Description**
 
 The script employs Python's triple-quoted string literals (`""" """`) to create a multi-line string. This string contains the formatted information for each team member. The `print()` function then outputs this entire string to the console.
 
@@ -67,7 +75,10 @@ Discipline: Cell Biology and Genetics
 Preferred Programming Language: Python
 """)
 ```
-Output
+
+**Output**
+
+
 The script produces a formatted text output to the console, displaying the information for each team member.
 
 ```
@@ -121,5 +132,7 @@ Country: Nigeria
 Discipline: Cell Biology and Genetics
 Preferred Programming Language: Python
 ```
-Considerations
+
+**Considerations**
+
 While this script effectively displays the information, it's important to note that for larger datasets or more complex data management, using data structures like dictionaries or lists and then iterating to print the information is generally more efficient and maintainable. This script provides a simple, direct output for a small, fixed set of data.
