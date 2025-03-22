@@ -1,5 +1,5 @@
-Team ACG Members' Information
-Overview
+##Team ACG Members' Information
+##Overview
 This Python script uses a single multi-line `print` statement to display information about the members of Team ACG. The information includes each member's:
 
 -   Name
