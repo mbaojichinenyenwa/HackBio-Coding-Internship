@@ -131,4 +131,4 @@ Preferred Programming Language: Python
 ---
 
 ## **Considerations**  
-While this script effectively displays team member details, for **larger datasets** or **more structured data management**, using **dictionaries or lists** and iterating through them would be more efficient. This approach keeps the code **maintainable** and **scalable** while ensuring easy modifications in the future.
+While this script effectively displays team member details, for **larger datasets** or **more structured data management**, using **dictionaries or lists** and iterating through them would be more efficient. 
