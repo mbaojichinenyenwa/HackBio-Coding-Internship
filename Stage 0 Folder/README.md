@@ -13,7 +13,7 @@ This Python script displays structured details about the members of **Team ACG**
 The script provides a simple and effective way to present team member details in a well-formatted text output.  
 
 ---
-
+ 
 ## **Code Description**  
 This script utilises **triple-quoted string literals** (`""" """`) to store and display multi-line formatted text. The `print()` function is then used to output this data directly to the console.  
 
