@@ -1,6 +1,6 @@
 # DNA Translation, Logistic Growth, and String Comparison
 
-This project provides simple Python functions for DNA translation, logistic population growth simulation, and string comparison.
+This task provides simple Python functions for DNA translation, logistic population growth simulation, and string comparison.
 
 ## Functions
 
