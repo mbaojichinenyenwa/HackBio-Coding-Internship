@@ -1,5 +1,5 @@
-def translate_dna(dna):  
-    table = {  # A dictionary for codon-amino acid mapping
+def translate_dna(dna):
+    table = { 
         'TTT': 'F', 'TTC': 'F', 'TTA': 'L', 'TTG': 'L', 'TCT': 'S', 'TCC': 'S', 'TCA': 'S', 'TCG': 'S',
         'TAT': 'Y', 'TAC': 'Y', 'TAA': '*', 'TAG': '*', 'TGT': 'C', 'TGC': 'C', 'TGA': '*', 'TGG': 'W',
         'CTT': 'L', 'CTC': 'L', 'CTA': 'L', 'CTG': 'L', 'CCT': 'P', 'CCC': 'P', 'CCA': 'P', 'CCG': 'P',
@@ -9,46 +9,41 @@ def translate_dna(dna):
         'GTT': 'V', 'GTC': 'V', 'GTA': 'V', 'GTG': 'V', 'GCT': 'A', 'GCC': 'A', 'GCA': 'A', 'GCG': 'A',
         'GAT': 'D', 'GAC': 'D', 'GAA': 'E', 'GAG': 'E', 'GGT': 'G', 'GGC': 'G', 'GGA': 'G', 'GGG': 'G'
     }
-    protein = ''  
+    protein = ''
     for i in range(0, len(dna), 3):  
-        codon = dna[i:i+3].upper()  
-        protein += table.get(codon, 'X')  # Adds the amino acid to the protein, 'X' for unknown codons
-    return protein  
+        codon = dna[i:i + 3].upper() # Extracts each codon.
+        protein += table.get(codon, 'X')  # Add amino acid or 'X' if unknown
+    return protein
 
-def logistic_grow(t, cap, rate, lag, exp):  # Defines a logistic growth function
-    if t < lag: return 0.01  
-    t_adj = t - lag  
-    if t_adj < exp: return cap / (1 + ((cap - 0.01) / 0.01) * 2.71828**(-rate * t_adj)) 
-    return cap  
+def logistic_grow(t, cap, rate, lag, exp):
+    if t < lag:  # Lag phase
+        return 0.01
+    t_adj = t - lag 
+    if t_adj < exp:
+        return cap / (1 + ((cap - 0.01) / 0.01) * 2.71828 ** (-rate * t_adj))
+    return cap 
 
-def make_curves(n, max_t):  
-    data = {'Time': range(max_t)} 
-    for i in range(n):  
-        cap = (i * 9) + 100  
-        rate = (i/1000) + 0.1  
-        lag = (i % 20) 
-        exp = (i % 30) + 10 
-        data[f'Curve_{i}'] = [logistic_grow(t, cap, rate, lag, exp) for t in range(max_t)]  
-    return data  
+def time_to_80(cap, rate, lag, exp):
+    target = 0.8 * cap
+    t = lag # start at lag time
+    while logistic_grow(t, cap, rate, lag, exp) < target:
+        t += 0.01
+    return t
 
-def time_to_80(cap, rate, lag, exp): # Defines a function to calculate time to 80% capacity.
-    target = 0.8 * cap 
-    t = lag # starts time at lag phase.
-    while logistic_grow(t, cap, rate, lag, exp) < target: t += 0.01 
-    return t 
-
-def hamming(s1, s2): 
-    if len(s1) != len(s2): 
+def hamming(s1, s2):
+    """Calculates Hamming distance."""
+    if len(s1) != len(s2):
         ml = max(len(s1), len(s2)) 
-        s1 = s1.ljust(ml) 
+        s1 = s1.ljust(ml) # to pad shorter string
         s2 = s2.ljust(ml) 
-    d = 0 
+    distance = 0
     for i in range(len(s1)): 
-        if s1[i] != s2[i]: d += 1 
-    return d 
+        if s1[i] != s2[i]:
+            distance += 1
+    return distance
+
 
 print(translate_dna("ATGCGTAC"))
-curves = make_curves(100, 100) 
-print(curves['Curve_0'][:5]) 
-print(time_to_80(500, 0.3, 10, 30)) 
-print(hamming("mbaojichinenyenwa", "chinenye")) 
+print(logistic_grow(50, 500, 0.3, 10, 30))
+print(time_to_80(500, 0.3, 10, 30))
+print(hamming("Chinenyenwa", "nenyenwa"))
