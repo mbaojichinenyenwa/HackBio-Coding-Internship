@@ -30,7 +30,6 @@ When the provided Python code is executed, it will produce the following output:
 * The `translate_dna` function assumes the input DNA sequence is a multiple of 3, as it processes codons (3-base sequences).
 * The `logistic_grow` function uses a simplified logistic growth model, approximating Euler's number.
 * The `hamming` function pads shorter strings with spaces to ensure equal length before calculating the Hamming distance.
-* The code is designed for simplicity and clarity, and may not be optimised for performance in large-scale applications.
 * The example names used in the hamming function are "Chinenyenwa" and "nenyenwa", the code will work with any two strings.
 
 ## Python Code
