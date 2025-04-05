@@ -33,9 +33,9 @@ When the provided Python code is executed, it will produce the following output:
 * The code is designed for simplicity and clarity, and may not be optimised for performance in large-scale applications.
 * The example names used in the hamming function are "Chinenyenwa" and "nenyenwa", the code will work with any two strings.
 
-## Python Code (`main.py`)
+## Python Code
 
-```python
+```
 def translate_dna(dna):
     table = { 
         'TTT': 'F', 'TTC': 'F', 'TTA': 'L', 'TTG': 'L', 'TCT': 'S', 'TCC': 'S', 'TCA': 'S', 'TCG': 'S',
