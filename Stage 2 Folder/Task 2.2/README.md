@@ -27,14 +27,8 @@ The code will generate the following output:
 5.  Display a scatter plot comparing the time to reach carrying capacity for knockout and knock-in strains.
 6.  Display box plots showing the distribution of the time to reach carrying capacity for knockout and knock-in strains.
 7.  Print the results of the independent samples t-test, including the t-statistic and p-value, along with a basic interpretation of the statistical significance.
-8.  Placeholder comments indicating where to add your observations.
+8.  Placeholder comments indicating where to add observations.
 
-## Considerations
-
-* This code assumes the dataset has columns named 'Strain', 'Mutation' (with values '-' for knockout and '+' for knock-in), 'Time', and 'OD600'. You may need to adjust these names based on your actual dataset.
-* The method for determining the time to reach carrying capacity is a simplistic approximation based on the time of maximum OD600. More sophisticated methods might involve fitting growth models.
-* The statistical test assumes the data meets the assumptions of an independent samples t-test (e.g., approximate normality, independence). It's important to check these assumptions for a rigorous analysis.
-* The interpretation of the statistical test is basic. A more detailed analysis would consider the effect size and the biological context.
 
 ## Python Code
 
@@ -44,61 +38,68 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy import stats
 
-# 1. Load the Dataset
-# Assuming your data is in a CSV file named 'microbiology_data.csv'
-# Replace 'link_to_dataset.csv' with the actual path or URL
-df_micro = pd.read_csv('link_to_dataset.csv')
+df_micro = pd.read_csv('https://raw.githubusercontent.com/HackBio-Internship/2025_project_collection/refs/heads/main/Python/Dataset/mcgc.tsv', sep='\t')
 print("Microbiology Data Head:\n", df_micro.head())
 
-# 2. Identify Unique Strains
-unique_strains = df_micro['Strain'].unique() # Assuming 'Strain' is the column name
+# Create a new DataFrame 
+melted_df = pd.melt(df_micro, id_vars=['time'], var_name='well', value_name='OD600')
+
+melted_df[['Strain', 'condition']] = melted_df['well'].str.split('_', expand=True)
+melted_df['Mutation'] = melted_df['condition'].str.contains('ki').map({True: '+', False: '-'})
+
+print("\nMelted and Processed Data Head:\n", melted_df.head())
+
+unique_strains = melted_df['Strain'].unique()
 print("\nUnique Strains:", unique_strains)
 
-# 3. Iterate and Plot Growth Curves
-plt.figure(figsize=(10, 6)) # Adjust figure size as needed
-
+# Plotting Growth Curves
+plt.figure(figsize=(12, 8))
 for strain in unique_strains:
-    knockout_data = df_micro[(df_micro['Strain'] == strain) & (df_micro['Mutation'] == '-')] # Assuming 'Mutation' column
-    knockin_data = df_micro[(df_micro['Strain'] == strain) & (df_micro['Mutation'] == '+')]
-
-    plt.plot(knockout_data['Time'], knockout_data['OD600'], label=f'{strain} (-)', marker='o')
-    plt.plot(knockin_data['Time'], knockin_data['OD600'], label=f'{strain} (+)', marker='x')
+    knockout_data = melted_df[(melted_df['Strain'] == strain) & (melted_df['Mutation'] == '-')]
+    knockin_data = melted_df[(melted_df['Strain'] == strain) & (melted_df['Mutation'] == '+')]
+    plt.plot(knockout_data['time'], knockout_data['OD600'], label=f'{strain} (-)', marker='o', linewidth=1)
+    plt.plot(knockin_data['time'], knockin_data['OD600'], label=f'{strain} (+)', marker='x', linewidth=1)
 
 plt.xlabel('Time')
 plt.ylabel('OD600')
 plt.title('Growth Curves for Different Strains')
 plt.legend()
 plt.grid(True)
+plt.tight_layout()
 plt.show()
 
-# 4. Determine Time to Reach Carrying Capacity (Simple Approach - Time of Max OD600)
+# Determining Time to Reach Carrying Capacity (Time of Max OD600)
 carrying_capacity_times = []
 for strain in unique_strains:
-    knockout_data = df_micro[(df_micro['Strain'] == strain) & (df_micro['Mutation'] == '-')]
-    knockin_data = df_micro[(df_micro['Strain'] == strain) & (df_micro['Mutation'] == '+')]
-    time_cc_ko = knockout_data.loc[knockout_data['OD600'].idxmax(), 'Time'] if not knockout_data.empty else None
-    time_cc_ki = knockin_data.loc[knockin_data['OD600'].idxmax(), 'Time'] if not knockin_data.empty else None
-    carrying_capacity_times.append({'Strain': strain, 'Mutation': '-', 'Time_to_CC': time_cc_ko})
-    carrying_capacity_times.append({'Strain': strain, 'Mutation': '+', 'Time_to_CC': time_cc_ki})
+    knockout_data = melted_df[(melted_df['Strain'] == strain) & (melted_df['Mutation'] == '-')]
+    knockin_data = melted_df[(melted_df['Strain'] == strain) & (melted_df['Mutation'] == '+')]
+    if not knockout_data.empty:
+        time_cc_ko = knockout_data.loc[knockout_data['OD600'].idxmax(), 'time']
+        carrying_capacity_times.append({'Strain': strain, 'Mutation': '-', 'Time_to_CC': time_cc_ko})
+    if not knockin_data.empty:
+        time_cc_ki = knockin_data.loc[knockin_data['OD600'].idxmax(), 'time']
+        carrying_capacity_times.append({'Strain': strain, 'Mutation': '+', 'Time_to_CC': time_cc_ki})
 
 cc_times_df = pd.DataFrame(carrying_capacity_times)
 print("\nTime to Reach Carrying Capacity (Approximate):\n", cc_times_df)
 
-# 5. Generate Scatter Plot of Time to Reach CC
+# Scatter Plot of Time to Reach CC
 sns.scatterplot(data=cc_times_df, x='Time_to_CC', y='Strain', hue='Mutation')
 plt.title('Time to Reach Carrying Capacity for Knockout vs Knockin Strains')
 plt.xlabel('Time to Carrying Capacity')
 plt.ylabel('Strain')
+plt.tight_layout()
 plt.show()
 
-# 6. Generate Box Plot of Time to Reach CC
+# Box Plot of Time to Reach CC
 sns.boxplot(data=cc_times_df, x='Time_to_CC', y='Mutation')
 plt.title('Distribution of Time to Reach Carrying Capacity')
 plt.xlabel('Time to Carrying Capacity')
 plt.ylabel('Mutation Type')
+plt.tight_layout()
 plt.show()
 
-# 7. Statistical Difference (Simple Approach - Comparing Means)
+# Statistical Difference (Simple Approach - Comparing Means)
 ko_cc_times = cc_times_df[cc_times_df['Mutation'] == '-']['Time_to_CC'].dropna()
 ki_cc_times = cc_times_df[cc_times_df['Mutation'] == '+']['Time_to_CC'].dropna()
 if not ko_cc_times.empty and not ki_cc_times.empty:
@@ -111,7 +112,6 @@ if not ko_cc_times.empty and not ki_cc_times.empty:
 else:
     print("\nNot enough data to perform statistical test on carrying capacity times.")
 
-# Observations as comments will go here in your final code
-print("\n# Observations for Microbiology Task:")
-print("# You will add your observations about the growth curves, time to reach carrying capacity,")
-print("# scatter plot, box plot, and the statistical test results here as comments.")
+print(f"Observations for Microbiology Task:")
+print("Add  observations about the growth curves, time to carrying capacity,")
+print("scatter plot, box plot, and the statistical test results here as comments.")
