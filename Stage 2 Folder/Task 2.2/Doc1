@@ -1,0 +1,82 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from scipy import stats
+
+df_micro = pd.read_csv('https://raw.githubusercontent.com/HackBio-Internship/2025_project_collection/refs/heads/main/Python/Dataset/mcgc.tsv', sep='\t')
+print("Microbiology Data Head:\n", df_micro.head())
+
+# Create a new DataFrame 
+melted_df = pd.melt(df_micro, id_vars=['time'], var_name='well', value_name='OD600')
+
+melted_df[['Strain', 'condition']] = melted_df['well'].str.split('_', expand=True)
+melted_df['Mutation'] = melted_df['condition'].str.contains('ki').map({True: '+', False: '-'})
+
+print("\nMelted and Processed Data Head:\n", melted_df.head())
+
+unique_strains = melted_df['Strain'].unique()
+print("\nUnique Strains:", unique_strains)
+
+# Plotting Growth Curves
+plt.figure(figsize=(12, 8))
+for strain in unique_strains:
+    knockout_data = melted_df[(melted_df['Strain'] == strain) & (melted_df['Mutation'] == '-')]
+    knockin_data = melted_df[(melted_df['Strain'] == strain) & (melted_df['Mutation'] == '+')]
+    plt.plot(knockout_data['time'], knockout_data['OD600'], label=f'{strain} (-)', marker='o', linewidth=1)
+    plt.plot(knockin_data['time'], knockin_data['OD600'], label=f'{strain} (+)', marker='x', linewidth=1)
+
+plt.xlabel('Time')
+plt.ylabel('OD600')
+plt.title('Growth Curves for Different Strains')
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+# Determining Time to Reach Carrying Capacity (Time of Max OD600)
+carrying_capacity_times = []
+for strain in unique_strains:
+    knockout_data = melted_df[(melted_df['Strain'] == strain) & (melted_df['Mutation'] == '-')]
+    knockin_data = melted_df[(melted_df['Strain'] == strain) & (melted_df['Mutation'] == '+')]
+    if not knockout_data.empty:
+        time_cc_ko = knockout_data.loc[knockout_data['OD600'].idxmax(), 'time']
+        carrying_capacity_times.append({'Strain': strain, 'Mutation': '-', 'Time_to_CC': time_cc_ko})
+    if not knockin_data.empty:
+        time_cc_ki = knockin_data.loc[knockin_data['OD600'].idxmax(), 'time']
+        carrying_capacity_times.append({'Strain': strain, 'Mutation': '+', 'Time_to_CC': time_cc_ki})
+
+cc_times_df = pd.DataFrame(carrying_capacity_times)
+print("\nTime to Reach Carrying Capacity (Approximate):\n", cc_times_df)
+
+# Scatter Plot of Time to Reach CC
+sns.scatterplot(data=cc_times_df, x='Time_to_CC', y='Strain', hue='Mutation')
+plt.title('Time to Reach Carrying Capacity for Knockout vs Knockin Strains')
+plt.xlabel('Time to Carrying Capacity')
+plt.ylabel('Strain')
+plt.tight_layout()
+plt.show()
+
+# Box Plot of Time to Reach CC
+sns.boxplot(data=cc_times_df, x='Time_to_CC', y='Mutation')
+plt.title('Distribution of Time to Reach Carrying Capacity')
+plt.xlabel('Time to Carrying Capacity')
+plt.ylabel('Mutation Type')
+plt.tight_layout()
+plt.show()
+
+# Statistical Difference (Simple Approach - Comparing Means)
+ko_cc_times = cc_times_df[cc_times_df['Mutation'] == '-']['Time_to_CC'].dropna()
+ki_cc_times = cc_times_df[cc_times_df['Mutation'] == '+']['Time_to_CC'].dropna()
+if not ko_cc_times.empty and not ki_cc_times.empty:
+    t_statistic, p_value = stats.ttest_ind(ko_cc_times, ki_cc_times)
+    print(f"\nT-test Results (Time to Carrying Capacity):\nT-statistic: {t_statistic:.3f}, P-value: {p_value:.3f}")
+    if p_value < 0.05:
+        print("There is a statistically significant difference in the mean time to reach carrying capacity.")
+    else:
+        print("There is no statistically significant difference in the mean time to reach carrying capacity.")
+else:
+    print("\nNot enough data to perform statistical test on carrying capacity times.")
+
+print("\n# Observations for Microbiology Task:")
+print("# You will add your observations about the growth curves, time to carrying capacity,")
+print("# scatter plot, box plot, and the statistical test results here as comments.")
