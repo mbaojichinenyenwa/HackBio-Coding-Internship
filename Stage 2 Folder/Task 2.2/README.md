@@ -124,4 +124,4 @@ else:
     print(f"Not enough data for statistical test on max growth times.")
 
 print(f"# Observations:")
-print(f"# Add your notes about the plots and numbers here.")
+print(f"# Add notes about the plots and numbers.")
