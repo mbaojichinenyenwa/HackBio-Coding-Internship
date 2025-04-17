@@ -103,6 +103,7 @@ Interpretation:
 - The p-value is slightly above the conventional significance threshold (0.05),
   so there is insufficient statistical evidence to confirm that the mutation
   significantly affects the time to maximum growth.
+- However, the observed difference is suggestive and may be biologically meaningful.
 
 Average Time to Max Growth:
 - Knockout (−): 16.67 hours
@@ -115,6 +116,9 @@ Visual Insights (from plots):
   for knockin (+) variants.
 
 Summary:
-- A consistent trend across all strains indicates that the mutation potentially accelerates growth.
+- A consistent trend across all strains indicates that the mutation
+  potentially accelerates growth.
+- Additional replicates would enhance statistical power and help validate this trend.
 """)
+
 
