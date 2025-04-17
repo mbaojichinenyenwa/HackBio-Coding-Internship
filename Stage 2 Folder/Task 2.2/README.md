@@ -10,19 +10,28 @@ This Python script carries out a basic analysis of microbial growth curve data o
 The script performs the following steps:
 
 1.  **Loading the Data:** Reads the microbial growth data from a TSV file hosted online using the pandas library. The first few rows of the loaded data are printed to the console.
+
 2.  **Organising the Data:** The data is then reshaped from a wide format (where each well is a column) to a long format, creating a new DataFrame (`melted_df`) with columns for 'time', 'well', and 'OD600'.
+
 3.  **Assigning Strain and Mutation:** Based on a presumed pattern in the 'well' names (first letter for strain, number for mutation type), new 'Strain' and 'Mutation' columns are added to the `melted_df`.
     * Wells starting with 'A' are assigned 'StrainA'.
     * Wells starting with 'B' are assigned 'StrainB'.
     * Wells starting with 'C' are assigned 'StrainC'.
     * Wells with numbers '1' to '6' are assigned the mutation type '-'.
     * Wells with numbers '7' to '12' are assigned the mutation type '+'.
+
 4.  **Cleaning the Data:** Rows where the 'Strain' or 'Mutation' could not be determined based on the pattern are removed. The first few rows of the processed data are printed.
+
 5.  **Identifying Unique Strains:** The script identifies and prints the unique microbial strains present in the processed data.
+
 6.  **Plotting Growth Curves:** For each unique strain, the script generates a plot showing the OD600 values over time, distinguishing between the '-' (knockout) and '+' (knock-in) mutation types. These plots are displayed on the screen.
+
 7.  **Estimating Time to Maximum Growth:** A simple estimation of the time taken to reach maximum growth is calculated for each strain and mutation type by finding the time point at which the highest OD600 value was recorded. These times are presented in a DataFrame.
+
 8.  **Visualising Time to Maximum Growth:** The estimated times to maximum growth are visualised using a scatter plot (comparing knockout and knock-in for each strain) and a box plot (showing the distribution of these times for each mutation type across all strains). These plots are displayed.
+
 9.  **Simple Statistical Comparison:** An independent samples t-test is performed to compare the average time to maximum growth between the knockout and knock-in groups. The results of the t-test (t-statistic and p-value) are printed, along with a basic interpretation of the statistical significance.
+
 10. **Observations:** A placeholder is included in the output to remind the user to add their observations and interpretations of the results.
 
 
