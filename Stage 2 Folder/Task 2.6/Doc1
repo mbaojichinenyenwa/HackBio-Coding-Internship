@@ -1,1 +1,61 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Load the dataset with correct delimiter (space-delimited)
+url = 'https://gist.githubusercontent.com/stephenturner/806e31fce55a8b7175af/raw/1a507c4c3f9f1baaa3a69187223ff3d3050628d4/results.txt'
+df_rna = pd.read_csv(url, sep='\s+')
+
+df_rna.columns = df_rna.columns.str.strip()
+print(f"Available columns: {df_rna.columns.tolist()}")
+
+# Volcano Plot
+plt.figure(figsize=(10, 6))
+log2fc = df_rna['log2FoldChange']
+pvalue = df_rna['pvalue']
+neg_log10_pvalue = -np.log10(pvalue)
+
+plt.scatter(log2fc, neg_log10_pvalue, alpha=0.5)
+plt.xlabel('Log2 Fold Change (Log2FC)')
+plt.ylabel('-log10(p-value)')
+plt.title('Volcano Plot')
+plt.axvline(1, color='red', linestyle='--', label='Log2FC = 1')
+plt.axvline(-1, color='blue', linestyle='--', label='Log2FC = -1')
+plt.axhline(-np.log10(0.01), color='green', linestyle='--', label='p = 0.01')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+df_rna = df_rna.replace([np.inf, -np.inf], np.nan).dropna(subset=['log2FoldChange', 'pvalue'])
+
+# Determine Upregulated and Downregulated Genes
+upregulated_genes = df_rna[(df_rna['log2FoldChange'] > 1) & (df_rna['pvalue'] < 0.01)]
+downregulated_genes = df_rna[(df_rna['log2FoldChange'] < -1) & (df_rna['pvalue'] < 0.01)]
+
+# Display Top 5
+top_up = upregulated_genes.sort_values(by='pvalue').head(5)
+top_down = downregulated_genes.sort_values(by='pvalue').head(5)
+
+top_up_genes = top_up['Gene'].tolist()
+top_down_genes = top_down['Gene'].tolist()
+
+print(f"Top 5 Upregulated Genes: {top_up_genes}")
+print(f"Top 5 Downregulated Genes: {top_down_genes}")
+
+# Functions of the Top 5 Upregulated and Downregulated Genes (Manual research from GeneCards):
+
+# Top 5 Upregulated Genes: ['EMILIN2', 'POU3F4', 'LOC285954', 'VEPH1', 'DTHD1']
+# EMILIN2: Elastin Microfibril Interfacer 2 – Involved in the formation of elastic fibers and anchoring of smooth muscle cells; plays roles in vascular integrity and may induce apoptosis in certain contexts.
+# POU3F4: POU Class 3 Homeobox 4 – Neural-specific transcription factor critical for inner ear development; involved in epigenetic signaling and differentiation of neuronal precursors.
+# LOC285954: Long non-coding RNA – Poorly characterized lncRNA; potential tumor suppressor activity has been suggested but is not well understood.
+# VEPH1: Ventricular Zone Expressed PH Domain Containing 1 – Thought to play a role in brain development; may regulate AKT and TGF-β signaling pathways, though functional studies are limited.
+# DTHD1: Death Domain Containing 1 – Contains a death domain; possible involvement in apoptotic pathways, although its function remains largely uncharacterized.
+
+# Top 5 Downregulated Genes: ['TBX5', 'LAMA2', 'CAV2', 'IFITM1', 'TNN']
+# TBX5: T-box Transcription Factor 5 – Transcription factor essential for cardiac and limb development; mutations are linked to Holt-Oram syndrome (congenital heart defects and limb malformations).
+# LAMA2: Laminin Subunit Alpha 2 – Major component of the basal lamina; crucial for muscle integrity and neuron migration; mutations lead to congenital muscular dystrophy.
+# CAV2: Caveolin 2 – Structural protein of caveolae; involved in lipid raft formation, endocytosis, and signal transduction; interacts with caveolin-1 to regulate cell signaling.
+# IFITM1: Interferon-Induced Transmembrane Protein 1 – Mediates antiviral defense by inhibiting viral entry; associated with immune responses and may also play roles in cancer progression.
+# TNN: Tenascin N – Extracellular matrix protein involved in axon guidance, skeletal development, and tissue remodeling; modulates cell adhesion and migration.
+
 
