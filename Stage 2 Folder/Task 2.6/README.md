@@ -22,7 +22,7 @@ The code will generate the following output:
 2.  Display a volcano plot showing the relationship between Log2 Fold Change and significance (-log10(p-value)) for all genes.
 3.  Print the head of the DataFrame containing the upregulated genes.
 4.  Print the head of the DataFrame containing the downregulated genes.
-5.  Placeholder comments indicating where to add the functions of the top genes and overall observations.
+5.  Placeholder comments indicating where to add the functions of the top genes.
 
 
 ## Python Code
