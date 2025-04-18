@@ -1,0 +1,65 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+
+sift_df = pd.read_csv('https://raw.githubusercontent.com/HackBio-Internship/public_datasets/main/R/datasets/sift.tsv', sep='\t')
+foldx_df = pd.read_csv('https://raw.githubusercontent.com/HackBio-Internship/public_datasets/main/R/datasets/foldX.tsv', sep='\t')
+
+# Clean column names to avoid errors
+sift_df.columns = sift_df.columns.str.strip()
+foldx_df.columns = foldx_df.columns.str.strip()
+
+# Merging the two dataframes on the Protein and Amino_Acid columns
+merged_df = pd.merge(sift_df, foldx_df, on=['Protein', 'Amino_Acid'], how='inner')
+
+# Filter for deleterious mutations (SIFT < 0.05, FoldX > 2)
+deleterious_mutations = merged_df[(merged_df['sift_Score'] < 0.05) & (merged_df['foldX_Score'] > 2)]
+
+# Printing out results 
+if not deleterious_mutations.empty:
+    print(f"Deleterious Mutations:\n{deleterious_mutations}")
+else:
+    print("No deleterious mutations found based on the criteria.")
+
+# Plotting the frequency of amino acids in the SIFT data
+sift_df['Original_AA'] = sift_df['Amino_Acid'].str[0]
+aa_frequency = sift_df['Original_AA'].value_counts()
+
+plt.figure(figsize=(12, 5))
+
+# Bar plot of amino acid frequencies
+plt.subplot(1, 2, 1)
+sns.barplot(x=aa_frequency.index, y=aa_frequency.values)
+plt.xlabel('Amino Acid')
+plt.ylabel('Frequency')
+plt.title('Frequency of Amino Acids (SIFT Data)')
+
+# Pie chart of amino acid proportions
+plt.subplot(1, 2, 2)
+plt.pie(aa_frequency, labels=aa_frequency.index, autopct='%1.1f%%', startangle=90)
+plt.title('Proportion of Amino Acids (SIFT Data)')
+
+plt.tight_layout()
+plt.show()
+
+
+print(f"""
+Observations for Biochemistry & Oncology Task:
+
+• Highest impact amino acid (original): R (Arginine)
+
+• Arginine (R):
+  - Positively charged, polar amino acid.
+  - Frequently involved in hydrogen bonding and salt bridge formation.
+  - Commonly found at protein active/binding sites.
+
+• Frequently occurring amino acids (from SIFT data):
+  - R (Arginine), G (Glycine), P (Proline), A (Alanine)
+
+• Structural & functional observations:
+  - Glycine (G): Smallest residue, it adds flexibility to protein backbone.
+  - Proline (P): Rigid structure, introduces kinks; often found in turns.
+  - Alanine (A): Small, non-polar; it frequently appears in alpha helices.
+  - Arginine (R): Critical for binding negatively charged ligands or DNA/RNA.
+""")
